@@ -1,1 +1,1 @@
-from .storage import TencentCOSStorage
+from .storage import TencentCOSStorage  # noqa: F401
