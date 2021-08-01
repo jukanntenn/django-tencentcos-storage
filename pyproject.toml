@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-tencentcos-storage"
-version = "0.1.0"
+version = "0.2.0"
 description = "A django app for Tencent Cloud Object Storage. 腾讯云对象存储（COS）服务 for Django。"
 license = "BSD-3-Clause"
 authors = ["jukanntenn <jukanntenn@outlook.com>"]

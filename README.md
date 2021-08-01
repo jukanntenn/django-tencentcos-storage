@@ -46,12 +46,12 @@ TENCENTCOS_STORAGE = {
     "BUCKET": "存储桶名称",
     # 存储桶文件根路径，选填，默认 '/'
     "ROOT_PATH": "/",
-  	# 上传文件时最大缓冲区大小（单位 MB），选填，默认 100
-  	"UPLOAD_MAX_BUFFER_SIZE": 100,
-  	# 上传文件时分块大小（单位 MB），选填，默认 10
-  	"UPLOAD_PART_SIZE": 10,
-  	# 上传并发上传时最大线程数，选填，默认 5
-  	"UPLOAD_MAX_THREAD": 5,
+    # 上传文件时最大缓冲区大小（单位 MB），选填，默认 100
+    "UPLOAD_MAX_BUFFER_SIZE": 100,
+    # 上传文件时分块大小（单位 MB），选填，默认 10
+    "UPLOAD_PART_SIZE": 10,
+    # 上传并发上传时最大线程数，选填，默认 5
+    "UPLOAD_MAX_THREAD": 5,
     # 腾讯云存储 Python SDK 的配置参数，详细说明请参考腾讯云官方文档
     "CONFIG": {
         "Region": "地域信息",
