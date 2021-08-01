@@ -22,6 +22,10 @@ class TencentCOSStorage(Storage):
         if not self.root_path.endswith("/"):
             self.root_path += "/"
 
+        self.upload_max_buffer_size = setting.get("UPLOAD_MAX_BUFFER_SIZE", None)
+        self.upload_part_size = setting.get("UPLOAD_PART_SIZE", None)
+        self.upload_max_thread = setting.get("UPLOAD_MAX_THREAD", None)
+
         config_kwargs = config or setting.get("CONFIG", {})
         required = ["Region", "SecretId", "SecretKey"]
         for key in required:
@@ -97,12 +101,16 @@ class TencentCOSStorage(Storage):
         return TencentCOSFile(self._full_path(name), self)
 
     def _save(self, name, content):
+        upload_kwargs = {}
+        if self.upload_max_buffer_size is not None:
+            upload_kwargs["MaxBufferSize"] = self.upload_max_buffer_size
+        if self.upload_part_size is not None:
+            upload_kwargs["PartSize"] = self.upload_part_size
+        if self.upload_max_thread is not None:
+            upload_kwargs["MAXThread"] = self.upload_max_thread
+
         self.client.upload_file_from_buffer(
-            Bucket=self.bucket,
-            Key=self._full_path(name),
-            Body=content,
-            PartSize=5,
-            MAXThread=10,
+            self.bucket, self._full_path(name), content, **upload_kwargs
         )
         return name
 

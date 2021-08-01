@@ -39,6 +39,46 @@ class TestTencentCOSStorage:
         with pytest.raises(ImproperlyConfigured):
             TencentCOSStorage()
 
+    def test_minimal_proper_setting(self, settings):
+        settings.TENCENTCOS_STORAGE = {
+            "BUCKET": "test-bucket",
+            "CONFIG": {
+                "Region": "region",
+                "SecretId": "********",
+                "SecretKey": "********",
+            },
+        }
+        storage = TencentCOSStorage()
+        assert storage.bucket == "test-bucket"
+        assert storage.root_path == "/"
+        assert storage.upload_max_buffer_size is None
+        assert storage.upload_part_size is None
+        assert storage.upload_max_thread is None
+
+        config = storage.client.get_conf()
+        assert config._region == "region"
+        assert config._secret_id == "********"
+        assert config._secret_key == "********"
+
+    def test_full_proper_setting(self, settings):
+        settings.TENCENTCOS_STORAGE = {
+            "BUCKET": "test-bucket",
+            "UPLOAD_MAX_BUFFER_SIZE": 200,
+            "UPLOAD_PART_SIZE": 5,
+            "UPLOAD_MAX_THREAD": 10,
+            "CONFIG": {
+                "Region": "region",
+                "SecretId": "********",
+                "SecretKey": "********",
+            },
+        }
+        storage = TencentCOSStorage()
+        assert storage.bucket == "test-bucket"
+        assert storage.root_path == "/"
+        assert storage.upload_max_buffer_size == 200
+        assert storage.upload_part_size == 5
+        assert storage.upload_max_thread == 10
+
     def test_normalize_root_path(self):
         storage = TencentCOSStorage(
             bucket="test-bucket",
@@ -140,11 +180,35 @@ class TestTencentCOSStorage:
         obj = storage._open("file")
         assert isinstance(obj, File)
 
-    def test__save(self, monkeypatch, storage):
+    def test__save_with_default_upload_kwargs(self, monkeypatch, storage):
+        content = File(io.BytesIO(b"bar"), "foo")
+        mm = MagicMock(
+            return_value=None,
+        )
+        monkeypatch.setattr(CosS3Client, "upload_file_from_buffer", mm)
+        storage._save("file", content)
+        mm.assert_called_once_with("test-bucket", "/file", content)
+
+    def test__save_with_custom_upload_kwargs(self, monkeypatch, settings):
+        settings.TENCENTCOS_STORAGE = {
+            "BUCKET": "test-bucket",
+            "UPLOAD_MAX_BUFFER_SIZE": 200,
+            "UPLOAD_PART_SIZE": 5,
+            "UPLOAD_MAX_THREAD": 10,
+            "CONFIG": {
+                "Region": "region",
+                "SecretId": "********",
+                "SecretKey": "********",
+            },
+        }
+        storage = TencentCOSStorage()
         mm = MagicMock(return_value=None)
         monkeypatch.setattr(CosS3Client, "upload_file_from_buffer", mm)
-        storage._save("file", File(io.BytesIO(b"bar"), "foo"))
-        assert mm.called
+        content = File(io.BytesIO(b"bar"), "foo")
+        storage._save("file", content)
+        mm.assert_called_once_with(
+            "test-bucket", "/file", content, MaxBufferSize=200, PartSize=5, MAXThread=10
+        )
 
     def test_url(self, monkeypatch, storage):
         mm = MagicMock()
