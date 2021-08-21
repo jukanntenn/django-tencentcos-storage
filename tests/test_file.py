@@ -1,11 +1,14 @@
+from io import BytesIO
+from tempfile import SpooledTemporaryFile
+from unittest.mock import MagicMock
+
 import pytest
-from tencentcos_storage.file import TencentCOSFile
-from urllib3.response import HTTPResponse
 from qcloud_cos.cos_client import CosS3Client
 from qcloud_cos.streambody import StreamBody
-from io import BytesIO
-from unittest.mock import MagicMock
 from requests.models import Response
+from urllib3.response import HTTPResponse
+
+from tencentcos_storage.file import TencentCOSFile
 
 
 def test_get_file(monkeypatch: pytest.MonkeyPatch, storage):
@@ -19,7 +22,7 @@ def test_get_file(monkeypatch: pytest.MonkeyPatch, storage):
     mock = MagicMock(return_value={"Body": StreamBody(requests_response)})
     monkeypatch.setattr(CosS3Client, "get_object", mock)
     tencentcos_file = TencentCOSFile(name="test-file", storage=storage)
-    assert isinstance(tencentcos_file.file, BytesIO)
+    assert isinstance(tencentcos_file.file, SpooledTemporaryFile)
     assert tencentcos_file.file.read() == b"test file content"
     mock.assert_called_once()
 
