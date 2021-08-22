@@ -1,16 +1,22 @@
+from datetime import datetime, timezone
+
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import Storage
 from django.utils._os import safe_join
 from django.utils.deconstruct import deconstructible
 from qcloud_cos import CosConfig, CosS3Client
 from qcloud_cos.cos_exception import CosServiceError
-from django.core.exceptions import ImproperlyConfigured
+
 from .file import TencentCOSFile
 
 
 @deconstructible
 class TencentCOSStorage(Storage):
     """Tencent Cloud Object Storage class for Django pluggable storage system."""
+
+    def path(self, name):
+        return super(TencentCOSStorage, self).path(name)
 
     def __init__(self, bucket=None, root_path=None, config=None):
         setting = getattr(settings, "TENCENTCOS_STORAGE", {})
@@ -85,11 +91,21 @@ class TencentCOSStorage(Storage):
         return head["Content-Length"]
 
     def get_modified_time(self, name):
-        # Not implement now
-        return super().get_modified_time(name)
+        head = self.client.head_object(Bucket=self.bucket, Key=self._full_path(name))
+        last_modified = head["Last-Modified"]
+        dt = datetime.strptime(last_modified, "%a, %d %b %Y %H:%M:%S %Z")
+        dt = dt.replace(tzinfo=timezone.utc)
+        if settings.USE_TZ:
+            return dt
+        # convert to local time
+        return datetime.fromtimestamp(dt.timestamp())
 
     def get_accessed_time(self, name):
-        # Not implement now
+        # Not implemented
+        return super().get_accessed_time(name)
+
+    def get_created_time(self, name):
+        # Not implemented
         return super().get_accessed_time(name)
 
     def url(self, name):

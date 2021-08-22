@@ -1,15 +1,15 @@
 import io
+from datetime import datetime, timezone
+from unittest.mock import MagicMock
 
 import pytest
-
+from django.core.exceptions import ImproperlyConfigured, SuspiciousFileOperation
 from django.core.files.base import File
-from qcloud_cos.cos_exception import CosServiceError
-from unittest.mock import MagicMock
-from qcloud_cos.cos_client import CosS3Client, CosConfig
-from django.core.exceptions import SuspiciousFileOperation
-from django.core.exceptions import ImproperlyConfigured
-from tencentcos_storage.storage import TencentCOSStorage
 from django.core.files.storage import Storage
+from qcloud_cos.cos_client import CosConfig, CosS3Client
+from qcloud_cos.cos_exception import CosServiceError
+
+from tencentcos_storage.storage import TencentCOSStorage
 
 
 class TestTencentCOSStorage:
@@ -168,11 +168,28 @@ class TestTencentCOSStorage:
         monkeypatch.setattr(CosS3Client, "head_object", mm)
         assert storage.size("test-file") == 10
 
-    def test_modified_time_not_implemented(self, storage):
-        with pytest.raises(NotImplementedError):
-            storage.get_modified_time("test-file")
+    def test_get_modified_time_use_tz(self, monkeypatch, settings, storage):
+        mm = MagicMock(return_value={"Last-Modified": "Sun, 22 Aug 2021 04:18:16 GMT"})
+        monkeypatch.setattr(CosS3Client, "head_object", mm)
+        settings.USE_TZ = True
+        assert storage.get_modified_time("test-file") == datetime(
+            2021, 8, 22, 4, 18, 16, tzinfo=timezone.utc
+        )
 
-    def test_accessed_time_not_implemented(self, storage):
+    def test_get_modified_time_does_not_use_tz(self, monkeypatch, settings, storage):
+        mm = MagicMock(return_value={"Last-Modified": "Sun, 22 Aug 2021 04:18:16 GMT"})
+        monkeypatch.setattr(CosS3Client, "head_object", mm)
+        settings.USE_TZ = False
+        timestamp = datetime(2021, 8, 22, 4, 18, 16, tzinfo=timezone.utc).timestamp()
+        assert storage.get_modified_time("test-file") == datetime.fromtimestamp(
+            timestamp
+        )
+
+    def test_get_accessed_time_not_implemented(self, storage):
+        with pytest.raises(NotImplementedError):
+            storage.get_accessed_time("test-file")
+
+    def test_get_created_time_not_implemented(self, storage):
         with pytest.raises(NotImplementedError):
             storage.get_accessed_time("test-file")
 
