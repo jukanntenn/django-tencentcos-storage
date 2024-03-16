@@ -203,7 +203,8 @@ class TestTencentCOSStorage:
             return_value=None,
         )
         monkeypatch.setattr(CosS3Client, "upload_file_from_buffer", mm)
-        storage._save("file", content)
+        name = storage._save("/file", content)
+        assert name == "file"
         mm.assert_called_once_with("test-bucket", "/file", content)
 
     def test__save_with_custom_upload_kwargs(self, monkeypatch, settings):

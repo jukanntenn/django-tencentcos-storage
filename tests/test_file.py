@@ -24,6 +24,7 @@ def test_get_file(monkeypatch: pytest.MonkeyPatch, storage):
     tencentcos_file = TencentCOSFile(name="test-file", storage=storage)
     assert isinstance(tencentcos_file.file, SpooledTemporaryFile)
     assert tencentcos_file.file.read() == b"test file content"
+    tencentcos_file.file.close()
     mock.assert_called_once()
 
 

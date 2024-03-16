@@ -128,7 +128,7 @@ class TencentCOSStorage(Storage):
         self.client.upload_file_from_buffer(
             self.bucket, self._full_path(name), content, **upload_kwargs
         )
-        return name
+        return name.lstrip("/")
 
     def get_available_name(self, name, max_length=None):
         name = self._full_path(name)

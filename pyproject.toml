@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-tencentcos-storage"
-version = "0.2.0"
+version = "0.2.1"
 description = "A django app for Tencent Cloud Object Storage. 腾讯云对象存储（COS）服务 for Django。"
 license = "BSD-3-Clause"
 authors = ["jukanntenn <jukanntenn@outlook.com>"]
@@ -11,23 +11,28 @@ packages = [
     { include = "tencentcos_storage" },
 ]
 
+[[tool.poetry.source]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "primary"
+
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.8.1,<4.0"
 cos-python-sdk-v5 = "^1.9.4"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
-pytest-django = "^4.3.0"
-pytest-cov = "^2.12.0"
-flake8 = "^3.9.2"
-black = "^21.6b0"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-django = "^4.8.0"
+pytest-cov = "^4.1.0"
+flake8 = "^7.0.0"
+black = "^24.3.0"
 
 [tool.coverage.run]
 include = ["tencentcos_storage/*"]
 omit = ["*tests*"]
 
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "8.0"
 DJANGO_SETTINGS_MODULE = "tests.django_settings"
 python_files = "tests.py test_*.py"
 addopts = "--cov=tencentcos_storage"
