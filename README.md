@@ -4,13 +4,13 @@
 
 ## 环境要求
 
-Python: >=3.7, <4
+Python: >=3.8.1, <4
 
-Django: >=2.2, <3.3
+Django: >=3.2, <6.0
 
 ## 安装
 
-```
+```bash
 pip install django-tencentcos-storage
 ```
 
@@ -40,6 +40,7 @@ TENCENTCOS_STORAGE = {
 ## 设置
 
 ### 示例
+
 ```python
 TENCENTCOS_STORAGE = {
     # 存储桶名称，必填
@@ -68,6 +69,7 @@ TENCENTCOS_STORAGE = {
 > 存储桶名称，必填
 
 **ROOT_PATH**
+
 > 文件根路径，选填，默认为 '/'
 
 **UPLOAD_MAX_BUFFER_SIZE**
@@ -76,6 +78,7 @@ TENCENTCOS_STORAGE = {
 > 其中缓冲区是一个线程安全队列，队列的元素为单个文件分块，队列中所有分块的大小加起来不超过 `UPLOAD_MAX_BUFFER_SIZE`。
 
 **UPLOAD_PART_SIZE**
+
 > 上传文件时分块大小（单位 MB），选填，默认 10。
 > `UPLOAD_MAX_BUFFER_SIZE` 和 `UPLOAD_PART_SIZE` 共同决定了缓冲队列的大小，即 `QueueSize` = `UPLOAD_MAX_BUFFER_SIZE` / `UPLOAD_PART_SIZE`。
 
@@ -85,7 +88,7 @@ TENCENTCOS_STORAGE = {
 > 当文件的大小超过 `UPLOAD_PART_SIZE` 时将使用分块的方式并发上传文件，此配置项设置并发上传的最大线程数。如果文件大小不超过 `UPLOAD_PART_SIZE`，则不会使用分块的方式上传，此时该配置项不起任何作用。
 
 **CONFIG**
-> 腾讯云对象存储 Python SDK 的配置参数，其中 `Region`、`SecretId`、`SecretKey` 为必填参数。
-> 
-> 关于配置参数的详细说明请参考 [腾讯云对象存储 Python SDK 官方文档](https://cloud.tencent.com/document/product/436/12269)
 
+> 腾讯云对象存储 Python SDK 的配置参数，其中 `Region`、`SecretId`、`SecretKey` 为必填参数。
+>
+> 关于配置参数的详细说明请参考 [腾讯云对象存储 Python SDK 官方文档](https://cloud.tencent.com/document/product/436/12269)
