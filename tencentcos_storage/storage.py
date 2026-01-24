@@ -131,5 +131,5 @@ class TencentCOSStorage(Storage):
         return name.lstrip("/")
 
     def get_available_name(self, name, max_length=None):
-        name = self._full_path(name)
+        name = self._full_path(name).lstrip("/")
         return super().get_available_name(name, max_length)
