@@ -42,7 +42,7 @@ jobs:
         run: tox -vv --notest
 
       - name: Run tox targets for ${{ matrix.python-version }}
-        run: tox --skip-pkg-install
+        run: tox
 
   lint:
     name: Lint
